@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  email     String   @unique
+  username  String  
+  password  String
+  picks     Pick[]   
+}
+
+model Tournament {
+  id        Int     @id @default(autoincrement())
+  name      String
+  week      Int
+  year      Int
+  date      DateTime
+  picks     Pick[]
+  results   Result[]
+}
+
+model Golfer {
+  id        Int     @id @default(autoincrement())
+  name      String
+  picks     Pick[]
+  results   Result[]
+}
+
+model Pick {
+  id          Int         @id @default(autoincrement())
+  userId      Int         
+  user        User        @relation(fields: [userId], references: [id])
+  tournId     Int
+  tournament  Tournament  @relation(fields: [tournId], references: [id])
+  golferId    Int
+  golfer      Golfer      @relation(fields: [golferId],references: [id])
+  @@unique([userId, tournId])
+}
+
+model Result {
+  id          Int         @id @default(autoincrement())
+  tournId     Int     
+  tournament  Tournament  @relation(fields: [tournId], references: [id])
+  golferId    Int  
+  golfer      Golfer      @relation(fields: [golferId],references: [id])
+  earnings    Float
+  placement   Int
+}
+
